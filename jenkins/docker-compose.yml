@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: jiang-coal-jenkins
+    restart: unless-stopped
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - JENKINS_OPTS=--argumentsRealm.roles.user=admin --argumentsRealm.passwd.admin=admin123 --argumentsRealm.roles.admin=admin
+      - TZ=Asia/Shanghai
+    networks:
+      - jenkins-network
+
+  # Allure 报告服务（可选）
+  allure:
+    image: frankescobar/allure-docker-service
+    container_name: jiang-coal-allure
+    restart: unless-stopped
+    ports:
+      - "5050:5050"
+    volumes:
+      - allure-results:/app/allure-results
+      - allure-reports:/app/default-reports
+    environment:
+      - CHECK_RESULTS_EVERY_SECONDS=60
+      - KEEP_HISTORY=1
+      - KEEP_HISTORY_LATEST=20
+    networks:
+      - jenkins-network
+
+volumes:
+  jenkins_home:
+  allure-results:
+  allure-reports:
+
+networks:
+  jenkins-network:
+    driver: bridge
