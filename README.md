@@ -1,4 +1,4 @@
-# 疆煤宝仓储管理系统 UI 自动化测试
+# xxxxxx系统 UI 自动化测试
 
 基于 Playwright + Python + pytest 的企业级 UI 自动化测试框架。
 
