@@ -1,0 +1,44 @@
+# Playwright + Python UI Automation
+# 疆煤宝仓储管理系统自动化测试项目
+
+# Test Framework
+pytest>=8.0.0
+pytest-playwright>=0.4.4
+pytest-xdist>=3.5.0  # Parallel execution
+pytest-rerunfailures>=13.0  # Retry flaky tests
+pytest-html>=4.1.1  # HTML report
+pytest-timeout>=2.2.0  # Timeout control
+pytest-order>=1.2.0  # Test ordering
+
+# Browser Automation
+playwright>=1.41.0
+
+# Data Generation
+faker>=22.0.0
+
+# Configuration
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+python-dotenv>=1.0.0
+
+# API Testing
+requests>=2.31.0
+httpx>=0.26.0
+
+# Database (if needed)
+# psycopg2-binary>=2.9.9  # PostgreSQL
+# pymysql>=1.1.0
+
+# Logging
+loguru>=0.7.2
+
+# Code Quality
+ruff>=0.1.0
+black>=24.1.0
+
+# Allure Report (optional)
+# allure-pytest>=2.13.2
+
+# Excel/CSV handling (for test data)
+openpyxl>=3.1.2
+pandas>=2.1.0

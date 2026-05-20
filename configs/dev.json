@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "base_url": "https://testerp.xjcec.com",
+    "api_url": "https://testerp.xjcec.com/api",
+    "timeout": 30000,
+    "headless": true,
+    "slow_mo": 100
+  },
+  "staging": {
+    "base_url": "https://staging.xjcec.com",
+    "api_url": "https://staging.xjcec.com/api",
+    "timeout": 30000,
+    "headless": true,
+    "slow_mo": 50
+  },
+  "production": {
+    "base_url": "https://erp.xjcec.com",
+    "api_url": "https://erp.xjcec.com/api",
+    "timeout": 30000,
+    "headless": true,
+    "slow_mo": 0
+  }
+}

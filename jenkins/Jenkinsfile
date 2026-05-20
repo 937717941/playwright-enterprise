@@ -1,0 +1,158 @@
+/**
+ * Jenkins Pipeline for 疆煤宝UI自动化测试
+ * Playwright + Python + pytest
+ */
+pipeline {
+    agent {
+        docker {
+            image 'python:3.10-slim'
+            args '-u root:root'
+        }
+    }
+
+    environment {
+        ENVIRONMENT = 'dev'
+        PYTHONPATH = "${WORKSPACE}"
+    }
+
+    options {
+        timestamps()
+        timeout(time: 1, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+    }
+
+    stages {
+        stage('环境准备') {
+            steps {
+                echo '=== 环境准备 ==='
+                sh '''
+                    python --version
+                    pip --version
+                '''
+            }
+        }
+
+        stage('安装依赖') {
+            steps {
+                echo '=== 安装依赖 ==='
+                sh '''
+                    pip install -r requirements.txt --quiet
+                    playwright install chromium --with-deps
+                '''
+            }
+        }
+
+        stage('代码检查') {
+            steps {
+                echo '=== 代码检查 ==='
+                sh '''
+                    pip install ruff --quiet
+                    ruff check . --ignore E501 || true
+                '''
+            }
+        }
+
+        stage('冒烟测试') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                    changeRequest()
+                }
+            }
+            steps {
+                echo '=== 执行冒烟测试 ==='
+                sh '''
+                    pytest tests/ -m smoke -v --tb=short -n 2 || true
+                '''
+            }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: 'report.html',
+                        reportName: 'HTML测试报告'
+                    ])
+                    junit 'reports/junit.xml'
+                }
+            }
+        }
+
+        stage('完整回归测试') {
+            when {
+                anyOf {
+                    branch 'main'
+                    tag "*"
+                }
+            }
+            steps {
+                echo '=== 执行完整回归测试 ==='
+                sh '''
+                    pytest tests/ -v --tb=short -n 4 || true
+                '''
+            }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: 'report.html',
+                        reportName: 'HTML测试报告'
+                    ])
+                    junit 'reports/junit.xml'
+                }
+            }
+        }
+
+        stage('移动端测试') {
+            when {
+                anyOf {
+                    branch 'develop'
+                    changeRequest()
+                }
+            }
+            steps {
+                echo '=== 执行移动端H5测试 ==='
+                sh '''
+                    pytest tests/mobile/ -v --tb=short || true
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            echo '=== 清理 ==='
+            sh '''
+                # 删除认证文件
+                rm -f auth.json || true
+
+                # 保留截图和报告
+                ls -la screenshots/ || true
+                ls -la reports/ || true
+            '''
+
+            // 清理工作空间
+            cleanWs()
+        }
+
+        success {
+            echo '=== 构建成功 ==='
+            // 发送成功通知（可配置钉钉/Slack Webhook）
+        }
+
+        failure {
+            echo '=== 构建失败 ==='
+            // 发送失败通知
+        }
+
+        unstable {
+            echo '=== 构建不稳定 ==='
+        }
+    }
+}

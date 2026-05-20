@@ -1,0 +1,12 @@
+{
+  "admin": {
+    "username": "13260630892",
+    "password": "Aa123456",
+    "role": "admin"
+  },
+  "test_user": {
+    "username": "test@example.com",
+    "password": "Test@123456",
+    "role": "user"
+  }
+}
