@@ -22,14 +22,17 @@ from configs.settings import settings
 @pytest.fixture(scope="session")
 def browser_type_launch_args(browser_type_launch_args):
     """浏览器启动参数"""
-    args = [
-        "--start-maximized",
-        "--disable-dev-shm-usage",
-        "--no-sandbox",
-    ]
-    if settings.headless:
-        args.append("--headless=new")
-    return args
+    launch_args = {
+        **browser_type_launch_args,
+        "args": [
+            "--start-maximized",
+            "--disable-dev-shm-usage",
+            "--no-sandbox",
+        ],
+        "headless": settings.headless,
+        "slow_mo": settings.slow_mo,
+    }
+    return launch_args
 
 
 # ==================== Function Fixtures ====================
